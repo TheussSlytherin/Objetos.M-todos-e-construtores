@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Autenticação Java</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Fontes Google Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Customizado para animações e scrollbars */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        pre code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar para código */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navbar -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-brand-600/20 text-brand-500 rounded-xl border border-brand-500/30">
+                    <i data-lucide="coffee" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">Java Auth System</h1>
+                    <p class="text-xs text-slate-400">Simulador de Backend & Frontend em Tempo Real</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span id="badge-status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    Sem Conta Cadastrada
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal divido em 2 colunas no Desktop -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Coluna Esquerda: Simulador Interativo (5 Colunas) -->
+        <section class="lg:col-span-5 flex flex-col justify-start">
+            <!-- Card do App -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+                
+                <!-- Toast Notification Container -->
+                <div id="toast" class="hidden absolute top-4 left-4 right-4 p-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 z-20 shadow-lg"></div>
+
+                <!-- TELA 1: MENU PRINCIPAL / ESCOLHA -->
+                <div id="screen-menu" class="fade-enter-active flex flex-col items-center text-center py-4">
+                    <div class="w-16 h-16 bg-brand-500/10 text-brand-500 rounded-2xl flex items-center justify-center mb-6 border border-brand-500/20 shadow-inner">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Bem-vindo!</h2>
+                    <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+                        Escolha uma opção no menu interativo para simular o comportamento da sua classe Java <code class="text-brand-400 font-mono">Login.java</code>.
+                    </p>
+
+                    <div class="w-full space-y-3">
+                        <button onclick="navTo('login')" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition duration-200 shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 group">
+                            <i data-lucide="log-in" class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"></i>
+                            1. Fazer Login
+                        </button>
+                        <button onclick="navTo('register')" class="w-full py-3.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 hover:border-slate-600 transition duration-200 flex items-center justify-center gap-2">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            2. Criar Nova Conta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TELA 2: CRIAR CONTA -->
+                <div id="screen-register" class="hidden fade-enter flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <button onclick="navTo('menu')" class="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Criar Nova Conta</h2>
+                            <p class="text-xs text-slate-400">Instancia <code class="text-brand-400 font-mono">CriarConta.java</code></p>
+                        </div>
+                    </div>
+
+                    <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Nome de Usuário</label>
+                            <div class="relative">
+                                <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500"></i>
+                                <input type="text" id="reg-username" required placeholder="ex: dev_java" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Senha</label>
+                            <div class="relative">
+                                <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500"></i>
+                                <input type="password" id="reg-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">E-mail</label>
+                            <div class="relative">
+                                <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500"></i>
+                                <input type="email" id="reg-email" required placeholder="dev@exemplo.com" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition text-sm">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition duration-200 shadow-lg shadow-brand-600/20 mt-2">
+                            Salvar Dados na Memória
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TELA 3: LOGIN -->
+                <div id="screen-login" class="hidden fade-enter flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <button onclick="navTo('menu')" class="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Fazer Login</h2>
+                            <p class="text-xs text-slate-400">Executa o loop de validação do Java</p>
+                        </div>
+                    </div>
+
+                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Nome de Usuário</label>
+                            <div class="relative">
+                                <i data-lucide="user" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500"></i>
+                                <input type="text" id="login-username" required placeholder="Digite seu usuário" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Senha</label>
+                            <div class="relative">
+                                <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500"></i>
+                                <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition text-sm">
+                            </div>
+                        </div>
+
+                        <div id="login-error-box" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 space-y-1">
+                            <p class="font-bold flex items-center gap-1.5">
+                                <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                                Nome de usuário ou senha incorretos!
+                            </p>
+                            <p class="text-slate-400">Tentativa falhou. O laço <code class="text-red-300 font-mono">do-while</code> continua aguardando credenciais corretas.</p>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition duration-200 shadow-lg shadow-brand-600/20 mt-2">
+                            Validar Credenciais
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TELA 4: DASHBOARD / PAINEL DE SUCESSO -->
+                <div id="screen-dashboard" class="hidden fade-enter flex flex-col items-center text-center py-2">
+                    <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mb-4 border border-emerald-500/20 animate-bounce">
+                        <i data-lucide="check-circle" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-xs font-mono px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 mb-3">
+                        [SUCESSO] Login Realizado
+                    </span>
+                    <h2 id="dash-welcome" class="text-2xl font-bold text-white mb-1">Bem-vindo!</h2>
+                    <p id="dash-email" class="text-slate-400 text-sm mb-6">email@exemplo.com</p>
+
+                    <div class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-left mb-6 space-y-2 font-mono text-xs">
+                        <p class="text-slate-500">// Estado do Objeto ColetandoDados:</p>
+                        <p class="text-slate-300"><span class="text-brand-400">c.nome</span> = "<span id="state-nome" class="text-emerald-400"></span>"</p>
+                        <p class="text-slate-300"><span class="text-brand-400">c.senha</span> = "<span id="state-senha" class="text-emerald-400">******</span>"</p>
+                        <p class="text-slate-300"><span class="text-brand-400">c.email</span> = "<span id="state-email" class="text-emerald-400"></span>"</p>
+                    </div>
+
+                    <button onclick="handleLogout()" class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 transition duration-200 flex items-center justify-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        Sair (Logout)
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Coluna Direita: Código Java Orientado (7 Colunas) -->
+        <section class="lg:col-span-7 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl">
+            <!-- Navbar de Abas de Código -->
+            <div class="bg-slate-950 border-b border-slate-800 px-4 pt-3 flex items-center justify-between overflow-x-auto">
+                <div class="flex space-x-1">
+                    <button onclick="switchTab('ColetandoDados')" id="tab-ColetandoDados" class="px-4 py-2 text-xs font-mono font-medium rounded-t-lg transition flex items-center gap-2 bg-slate-900 text-brand-400 border-t border-x border-slate-800">
+                        <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                        ColetandoDados.java
+                    </button>
+                    <button onclick="switchTab('CriarConta')" id="tab-CriarConta" class="px-4 py-2 text-xs font-mono font-medium rounded-t-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200">
+                        <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                        CriarConta.java
+                    </button>
+                    <button onclick="switchTab('Login')" id="tab-Login" class="px-4 py-2 text-xs font-mono font-medium rounded-t-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200">
+                        <i data-lucide="file-code" class="w-3.5 h-3.5"></i>
+                        Login.java
+                    </button>
+                </div>
+
+                <button onclick="copyCode()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md border border-slate-700 mb-2 transition">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    Copiar
+                </button>
+            </div>
+
+            <!-- Área do Código com Syntax Highlighting Simulado -->
+            <div class="p-4 flex-1 overflow-y-auto max-h-[500px] bg-slate-950 font-mono text-xs leading-relaxed">
+                
+                <!-- COLETANDO DADOS CODE -->
+                <pre id="code-ColetandoDados" class="text-slate-300"><code><span class="text-purple-400">public class</span> <span class="text-yellow-400">ColetandoDados</span> {
+    <span class="text-purple-400">public</span> String nome;
+    <span class="text-purple-400">public</span> String senha;
+    <span class="text-purple-400">public</span> String email;
+}</code></pre>
+
+                <!-- CRIAR CONTA CODE -->
+                <pre id="code-CriarConta" class="hidden text-slate-300"><code><span class="text-purple-400">import</span> java.util.Scanner;
+
+<span class="text-purple-400">public class</span> <span class="text-yellow-400">CriarConta</span> {
+
+    <span class="text-slate-500">// Recebe o objeto 'c' para preencher na mesma memória</span>
+    <span class="text-purple-400">public void</span> <span class="text-blue-400">criarConta</span>(ColetandoDados c, Scanner scanner) {
+        System.out.println(<span class="text-emerald-300">"\n--- Criando uma nova conta ---"</span>);
+
+        System.out.print(<span class="text-emerald-300">"Digite o nome de usuário: "</span>);
+        c.nome = scanner.nextLine();
+
+        System.out.print(<span class="text-emerald-300">"Digite a senha: "</span>);
+        c.senha = scanner.nextLine();
+
+        System.out.print(<span class="text-emerald-300">"Digite o seu email: "</span>);
+        c.email = scanner.nextLine();
+    }
+}</code></pre>
+
+                <!-- LOGIN CODE -->
+                <pre id="code-Login" class="hidden text-slate-300"><code><span class="text-purple-400">import</span> java.util.Scanner;
+
+<span class="text-purple-400">public class</span> <span class="text-yellow-400">Login</span> {
+
+    <span class="text-purple-400">private void</span> <span class="text-blue-400">fazerLogin</span>(ColetandoDados c, Scanner scanner) {
+        String nomeUsuario;
+        String senha;
+
+        <span class="text-slate-500">// Laço repetitivo enquanto as credenciais estiverem incorretas</span>
+        <span class="text-purple-400">do</span> {
+            System.out.print(<span class="text-emerald-300">"Digite o seu nome de usuário: "</span>);
+            nomeUsuario = scanner.nextLine();
+
+            System.out.print(<span class="text-emerald-300">"Digite a sua senha: "</span>);
+            senha = scanner.nextLine();
+
+            <span class="text-purple-400">if</span> (nomeUsuario.equals(c.nome) && senha.equals(c.senha)) {
+                System.out.println(<span class="text-emerald-300">"\nLogin bem-sucedido! Bem-vindo, "</span> + c.nome + <span class="text-emerald-300">"!"</span>);
+                <span class="text-purple-400">break</span>;
+            } <span class="text-purple-400">else</span> {
+                System.out.println(<span class="text-emerald-300">"\nNome de usuário ou senha incorretos. Tente novamente.\n"</span>);
+            }
+        } <span class="text-purple-400">while</span> (<span class="text-purple-400">true</span>);
+    }
+
+    <span class="text-purple-400">public void</span> <span class="text-blue-400">escolha</span>() {
+        ColetandoDados c = <span class="text-purple-400">new</span> ColetandoDados();
+        Scanner scanner = <span class="text-purple-400">new</span> Scanner(System.in);
+
+        <span class="text-purple-400">while</span> (<span class="text-purple-400">true</span>) {
+            System.out.println(<span class="text-emerald-300">"1. Fazer login\n2. Criar nova conta"</span>);
+            <span class="text-purple-400">int</span> opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            <span class="text-purple-400">if</span> (opcao == 1) {
+                <span class="text-purple-400">if</span> (c.nome == <span class="text-purple-400">null</span>) {
+                    System.out.println(<span class="text-emerald-300">"Nenhuma conta encontrada!"</span>);
+                } <span class="text-purple-400">else</span> {
+                    fazerLogin(c, scanner);
+                    <span class="text-purple-400">break</span>;
+                }
+            } <span class="text-purple-400">else if</span> (opcao == 2) {
+                CriarConta criarConta = <span class="text-purple-400">new</span> CriarConta();
+                criarConta.criarConta(c, scanner);
+            }
+        }
+    }
+}</code></pre>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Inicialização dos ícones Lucide
+        lucide.createIcons();
+
+        // Estado em Memória (Simulando o objeto 'ColetandoDados c')
+        const coletandoDados = {
+            nome: null,
+            senha: null,
+            email: null
+        };
+
+        // Navegação entre telas do simulador
+        function navTo(screenId) {
+            const screens = ['menu', 'register', 'login', 'dashboard'];
+            screens.forEach(id => {
+                const el = document.getElementById(`screen-${id}`);
+                if (id === screenId) {
+                    el.classList.remove('hidden');
+                    el.classList.add('fade-enter-active');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Se for para a tela de login, limpa os erros prévios
+            if (screenId === 'login') {
+                document.getElementById('login-error-box').classList.add('hidden');
+                switchTab('Login');
+            } else if (screenId === 'register') {
+                switchTab('CriarConta');
+            } else {
+                switchTab('ColetandoDados');
+            }
+        }
+
+        // Lógica do Formulário de Registro (CriarConta.java)
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+
+            if (!username || !password || !email) {
+                showToast('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            // Atribui ao objeto c (ColetandoDados)
+            coletandoDados.nome = username;
+            coletandoDados.senha = password;
+            coletandoDados.email = email;
+
+            // Atualiza Badge do Sistema
+            const badge = document.getElementById('badge-status');
+            badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+            badge.innerHTML = `<span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400"></span>Conta Criada: ${username}`;
+
+            showToast('Conta cadastrada com sucesso! Agora você pode fazer login.', 'success');
+            
+            // Limpa o formulário e volta pro menu
+            document.getElementById('register-form').reset();
+            navTo('menu');
+        }
+
+        // Lógica do Formulário de Login (Login.java)
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errorBox = document.getElementById('login-error-box');
+
+            // Verifica se existe conta cadastrada
+            if (!coletandoDados.nome || !coletandoDados.senha) {
+                showToast('Nenhuma conta encontrada! Crie uma conta primeiro.', 'error');
+                navTo('register');
+                return;
+            }
+
+            // Simulação da comparação Java: nomeUsuario.equals(c.nome) && senha.equals(c.senha)
+            if (username === coletandoDados.nome && password === coletandoDados.senha) {
+                errorBox.classList.add('hidden');
+                
+                // Preenche dados da Dashboard
+                document.getElementById('dash-welcome').innerText = `Bem-vindo, ${coletandoDados.nome}!`;
+                document.getElementById('dash-email').innerText = coletandoDados.email;
+                document.getElementById('state-nome').innerText = coletandoDados.nome;
+                document.getElementById('state-senha').innerText = coletandoDados.senha;
+                document.getElementById('state-email').innerText = coletandoDados.email;
+
+                navTo('dashboard');
+                showToast('Login realizado com sucesso!', 'success');
+                document.getElementById('login-form').reset();
+            } else {
+                // Simula o erro do loop do-while
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        // Logout
+        function handleLogout() {
+            navTo('menu');
+            showToast('Sessão encerrada.', 'info');
+        }
+
+        // Sistema de Notificações Toast
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.remove('hidden', 'bg-red-500/20', 'text-red-300', 'bg-emerald-500/20', 'text-emerald-300', 'bg-brand-500/20', 'text-brand-300');
+
+            if (type === 'error') {
+                toast.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+            } else if (type === 'success') {
+                toast.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+            } else {
+                toast.classList.add('bg-brand-500/20', 'text-brand-300', 'border', 'border-brand-500/30');
+            }
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Troca de Abas do Viewer de Código
+        function switchTab(tabName) {
+            const tabs = ['ColetandoDados', 'CriarConta', 'Login'];
+            tabs.forEach(name => {
+                const tabBtn = document.getElementById(`tab-${name}`);
+                const codeBlock = document.getElementById(`code-${name}`);
+
+                if (name === tabName) {
+                    tabBtn.className = "px-4 py-2 text-xs font-mono font-medium rounded-t-lg transition flex items-center gap-2 bg-slate-900 text-brand-400 border-t border-x border-slate-800";
+                    codeBlock.classList.remove('hidden');
+                } else {
+                    tabBtn.className = "px-4 py-2 text-xs font-mono font-medium rounded-t-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200";
+                    codeBlock.classList.add('hidden');
+                }
+            });
+        }
+
+        // Copiar Código do Viewer
+        function copyCode() {
+            const visibleCode = document.querySelector('pre:not(.hidden) code').innerText;
+            
+            // Utilizando o método seguro indicado no sistema
+            const textarea = document.createElement('textarea');
+            textarea.value = visibleCode;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast('Código copiado para a área de transferência!', 'info');
+        }
+    </script>
+</body>
+</html>
