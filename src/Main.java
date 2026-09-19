@@ -1,15 +1,21 @@
+import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
-        CriarConta w = new CriarConta();
-        Login l = new Login();
-        ColetandoDados c = new ColetandoDados();
-        ExibirDados e = new ExibirDados();
+        // 1. Inicializa o recurso de entrada de dados
+        Scanner scanner = new Scanner(System.in);
 
-        l.escolha();
+        // 2. Instancia a classe responsável por iniciar o fluxo da aplicação
+        Login sistemaLogin = new Login();
 
-        c.coletarDados();
+        System.out.println("=== INICIANDO O SISTEMA ===");
 
-        e.exibir(c);
+        // 3. Delega o controle para a classe especialista
+        sistemaLogin.escolha();
+
+        // 4. Finaliza a execução e encerra recursos
+        System.out.println("\n=== OBRIGADO POR USAR O SISTEMA ===");
+        scanner.close();
     }
 }

@@ -92,12 +92,12 @@
 
     <!-- Conteúdo Principal divido em 2 colunas no Desktop -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+
         <!-- Coluna Esquerda: Simulador Interativo (5 Colunas) -->
         <section class="lg:col-span-5 flex flex-col justify-start">
             <!-- Card do App -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
-                
+
                 <!-- Toast Notification Container -->
                 <div id="toast" class="hidden absolute top-4 left-4 right-4 p-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 z-20 shadow-lg"></div>
 
@@ -263,7 +263,7 @@
 
             <!-- Área do Código com Syntax Highlighting Simulado -->
             <div class="p-4 flex-1 overflow-y-auto max-h-[500px] bg-slate-950 font-mono text-xs leading-relaxed">
-                
+
                 <!-- COLETANDO DADOS CODE -->
                 <pre id="code-ColetandoDados" class="text-slate-300"><code><span class="text-purple-400">public class</span> <span class="text-yellow-400">ColetandoDados</span> {
     <span class="text-purple-400">public</span> String nome;
@@ -402,7 +402,7 @@
             badge.innerHTML = `<span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400"></span>Conta Criada: ${username}`;
 
             showToast('Conta cadastrada com sucesso! Agora você pode fazer login.', 'success');
-            
+
             // Limpa o formulário e volta pro menu
             document.getElementById('register-form').reset();
             navTo('menu');
@@ -425,7 +425,7 @@
             // Simulação da comparação Java: nomeUsuario.equals(c.nome) && senha.equals(c.senha)
             if (username === coletandoDados.nome && password === coletandoDados.senha) {
                 errorBox.classList.add('hidden');
-                
+
                 // Preenche dados da Dashboard
                 document.getElementById('dash-welcome').innerText = `Bem-vindo, ${coletandoDados.nome}!`;
                 document.getElementById('dash-email').innerText = coletandoDados.email;
@@ -487,7 +487,7 @@
         // Copiar Código do Viewer
         function copyCode() {
             const visibleCode = document.querySelector('pre:not(.hidden) code').innerText;
-            
+
             // Utilizando o método seguro indicado no sistema
             const textarea = document.createElement('textarea');
             textarea.value = visibleCode;
