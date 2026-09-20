@@ -1,3 +1,5 @@
+package conexao;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -5,28 +7,21 @@ import java.sql.Statement;
 
 public class Conexao {
 
-    // Método responsável por conectar ao banco de dados SQLite
-    public static Connection conectar() {
-        Connection conexao = null;
+    private static final String URL = "jdbc:sqlite:biblioteca.db";
+
+    public static Connection conectar() throws SQLException {
         try {
-            // Garante o carregamento manual da classe do driver
+            // Força o carregamento da classe do driver SQLite
             Class.forName("org.sqlite.JDBC");
-
-            // Caminho para o arquivo do banco de dados (será criado na raiz do projeto)
-            String url = "jdbc:sqlite:biblioteca.db";
-            conexao = DriverManager.getConnection(url);
-
+            return DriverManager.getConnection(URL);
         } catch (ClassNotFoundException e) {
-            System.out.println("Driver JDBC do SQLite não foi encontrado no Classpath: " + e.getMessage());
-        } catch (SQLException e) {
-            System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
+            System.err.println("[ERRO CRÍTICO] Driver JDBC do SQLite não foi encontrado no Classpath!");
+            throw new SQLException("Driver JDBC ausente.", e);
         }
-
-        return conexao;
     }
 
     // Método responsável por criar as tabelas iniciais
-    public static void criarTabelas() {
+    public static void criarTabelas() throws SQLException {
         Connection conn = conectar();
 
         // Evita NullPointerException se a conexão tiver falhado
@@ -47,7 +42,8 @@ public class Conexao {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "titulo TEXT NOT NULL, "
                 + "autor TEXT NOT NULL, "
-                + "isbn TEXT"
+                + "isbn TEXT, "
+                + "ano INTEGER"
                 + ");";
 
         try (Statement stmt = conn.createStatement()) {

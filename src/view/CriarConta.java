@@ -1,3 +1,7 @@
+package view;
+
+import dao.UsuarioDAO;
+
 import java.util.Scanner;
 
 public class CriarConta {
