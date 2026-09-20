@@ -5,55 +5,68 @@ import java.sql.Statement;
 
 public class Conexao {
 
-    // Caminho do arquivo do banco SQLite (será criado na raiz da pasta do projeto)
-    private static final String URL = "jdbc:sqlite:biblioteca.db";
-
-    /**
-     * Estabelece e retorna uma conexão ativa com o banco de dados.
-     */
+    // Método responsável por conectar ao banco de dados SQLite
     public static Connection conectar() {
         Connection conexao = null;
         try {
-            conexao = DriverManager.getConnection(URL);
+            // Garante o carregamento manual da classe do driver
+            Class.forName("org.sqlite.JDBC");
+
+            // Caminho para o arquivo do banco de dados (será criado na raiz do projeto)
+            String url = "jdbc:sqlite:biblioteca.db";
+            conexao = DriverManager.getConnection(url);
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Driver JDBC do SQLite não foi encontrado no Classpath: " + e.getMessage());
         } catch (SQLException e) {
-            System.out.println("Erro ao conectar ao banco SQLite: " + e.getMessage());
+            System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
         }
+
         return conexao;
     }
 
-    /**
-     * Cria as tabelas necessárias no banco de dados, caso ainda não existam.
-     */
+    // Método responsável por criar as tabelas iniciais
     public static void criarTabelas() {
-        // Tabela para armazenar os usuários cadastrados
-        String sqlUsuarios = """
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL UNIQUE,
-                senha TEXT NOT NULL,
-                email TEXT
-            );
-        """;
+        Connection conn = conectar();
 
-        // Tabela para armazenar os livros
-        String sqlLivros = """
-            CREATE TABLE IF NOT EXISTS livros (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                titulo TEXT NOT NULL,
-                autor TEXT NOT NULL,
-                disponivel INTEGER DEFAULT 1
-            );
-        """;
+        // Evita NullPointerException se a conexão tiver falhado
+        if (conn == null) {
+            System.out.println("Falha na conexão. A criação de tabelas foi cancelada.");
+            return;
+        }
 
-        try (Connection conn = conectar();
-             Statement stmt = conn.createStatement()) {
+        // SQL para criação das tabelas 'usuarios' e 'livros'
+        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "nome TEXT NOT NULL, "
+                + "senha TEXT NOT NULL, "
+                + "email TEXT"
+                + ");";
 
+        String sqlLivros = "CREATE TABLE IF NOT EXISTS livros ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "titulo TEXT NOT NULL, "
+                + "autor TEXT NOT NULL, "
+                + "isbn TEXT"
+                + ");";
+
+        try (Statement stmt = conn.createStatement()) {
+            // Executa os comandos para criar as tabelas
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlLivros);
-            System.out.println("Banco de dados SQLite pronto para uso!");
+            System.out.println("Tabelas verificadas/criadas com sucesso.");
 
         } catch (SQLException e) {
-            System.out.println("Erro ao criar as tabelas: " + e.getMessage());
+            System.out.println("Erro ao criar tabelas: " + e.getMessage());
+        } finally {
+            // Garante o fechamento da conexão após criar as tabelas
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Erro ao fechar a conexão: " + e.getMessage());
+            }
         }
     }
 }
